@@ -1,0 +1,31 @@
+name: Upload Lambda to S3
+ 
+on:
+  push:
+    branches:
+      - main
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+ 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+ 
+    - name: Zip the lambda function
+      run: |
+        zip lambda_hello.zip lambda_hello.py
+        zip scrapper_ec2.zip scrapper_ec2.py
+ 
+    - name: Upload to S3
+      run: |
+        aws s3 cp lambda_hello.zip s3://lambda-upload0620/
+        aws s3 cp scrapper_ec2.zip s3://lambda-upload0620/
